@@ -68,7 +68,7 @@ def tsp_list(socket_name):
     df = pd.DataFrame(data=rows, columns=column_names)
     df["ID"] = df["ID"].astype(int)
     df = df.set_index("ID", drop=False).sort_index()
-    df["Time (r)"], df["Time (u)"], df["Time (s)"] = zip(*df["Times(r/u/s)"].apply(split_time))
+    df["Time (real)"], df["Time (user)"], df["Time (system)"] = zip(*df["Times(r/u/s)"].apply(split_time))
     df = df.drop(columns=["Times(r/u/s)"])
     df = df.rename(columns=lambda x: re.sub('Command.*$','Command',x))
     # print(df)
@@ -105,23 +105,23 @@ def list(socket_name=None):
     """
     data_df = tsp_list(socket_name)
 
-    filtered_df = data_df
+    response_df = data_df
     draw = int(request.args.get("draw", 0))
     start = request.args.get('start', None)
     if start is not None:
         start = int(start)
-        filtered_df = filtered_df.iloc[start:]
+        response_df = response_df.iloc[start:]
     length = request.args.get('length', None)
     if start is not None:
         length = int(length)
-        filtered_df = filtered_df.iloc[:length]
+        response_df = response_df.iloc[:length]
+    response_df["DT_RowId"] = response_df["ID"]
 
-    data_obj = filtered_df.to_dict('split')
     response = {
         "draw": draw,
         "recordsTotal": len(data_df),
         "recordsFiltered": len(data_df),
-        "data": data_obj["data"]
+        "data": response_df.to_dict('records')
     }
     # print(json.dumps(response, indent=2))
     return jsonify(response)
