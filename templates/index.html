@@ -25,14 +25,19 @@
   </nav>
 
   <div class="container-fluid">
-    <label class="d-flex justify-content-end align-items-center">
-      <span>Socket:</span>
-      <div class="col-md-3" style="margin: .5em 0 .5em .5em;">
-        <select id="socketName" name="socketName" class="form-select" aria-label="Select a socket"></select>
-      </div>
-    </label>
+    <div class="row align-items-center">
+      <div class="col-sm align-middle">Last refresh: <span id="lastRefresh"></span></div>
+      <label class="col-sm d-flex justify-content-end align-items-center">
+        <div>Socket:</div>
+        <div class="col-md-3" style="margin: .5em 0 .5em .5em;">
+          <select id="socketName" name="socketName" class="form-select" aria-label="Select a socket"></select>
+        </div>
+      </label>
+    </div>
 
-    <table id="mainTable" class="table table-striped"></table>
+    <div class="row">
+      <table id="mainTable" class="table table-striped"></table>
+    </div>
   </div>
 
   <footer class="navbar navbar-expand-lg fixed-bottom navbar-light bg-light">

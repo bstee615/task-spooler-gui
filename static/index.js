@@ -6,12 +6,12 @@ columns = [
     "Times(r/u/s)",
     "Command [run=0/1]",
 ]
+const RELOAD_INTERVAL_SECONDS = 10;
+let table = null;
 
 function basename(path) {
     return path.split('/').reverse()[0];
 }
-
-let table = null;
 
 function loadSockets() {
     $.getJSON("/tsp/list_sockets", function (data) {
@@ -24,9 +24,30 @@ function loadSockets() {
     })
 }
 
+function updateLastRefreshIndicator() {
+    $("#lastRefresh").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
+}
+
 $("#socketName").change(function () {
     table.ajax.url(getAjaxUrl()).load();
+    updateLastRefreshIndicator();
 })
+
+function refreshData() {
+    table.ajax.reload();
+    updateLastRefreshIndicator();
+}
+
+function initLastRefreshIndicator() {
+    updateLastRefreshIndicator();
+    // set timeout on next multiple of 10 seconds (to keep it nice and round)
+    let firstDate = new Date();
+    let targetSeconds = Math.ceil(firstDate.getSeconds() / 10) * 10;
+    setTimeout(refreshData, (targetSeconds - firstDate.getSeconds()) * 1000);
+    setTimeout(function() {
+        setInterval(refreshData, RELOAD_INTERVAL_SECONDS * 1000);
+    }, (targetSeconds - firstDate.getSeconds()) * 1000);
+}
 
 function getAjaxUrl() {
     let socketName = $("#socketName").val();
@@ -86,6 +107,7 @@ function loadTable() {
             },
         ],
     });
+    initLastRefreshIndicator();
 }
 
 $(document).ready(function () {
