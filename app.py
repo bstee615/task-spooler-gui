@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import pandas as pd
 from flask import Flask
@@ -69,6 +70,8 @@ def tsp_list(socket_name):
     df = df.set_index("ID", drop=False).sort_index()
     df["Time (r)"], df["Time (u)"], df["Time (s)"] = zip(*df["Times(r/u/s)"].apply(split_time))
     df = df.drop(columns=["Times(r/u/s)"])
+    df = df.rename(columns=lambda x: re.sub('Command.*$','Command',x))
+    # print(df)
     return df
 
 @app.route("/tsp/list")
@@ -120,6 +123,7 @@ def list(socket_name=None):
         "recordsFiltered": len(data_df),
         "data": data_obj["data"]
     }
+    # print(json.dumps(response, indent=2))
     return jsonify(response)
 
 def test_list():
