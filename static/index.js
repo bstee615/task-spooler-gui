@@ -7,6 +7,10 @@ columns = [
     "Command [run=0/1]",
 ]
 
+function basename(path) {
+    return path.split('/').reverse()[0];
+}
+
 function loadTable() {
     let socketName = $("#socketName").val();
     let url = "/tsp/list"
@@ -31,6 +35,9 @@ function loadTable() {
                 {
                     title: "Output",
                     data: "Output",
+                    render: function ( data, type, row ) {
+                        return '<a href="/tsp/output/' + basename(data) + '">' + data + '</a>';
+                    },
                 },
                 {
                     title: "E-Level",

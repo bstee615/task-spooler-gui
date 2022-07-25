@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import subprocess
 import pandas as pd
@@ -125,6 +126,15 @@ def list(socket_name=None):
     }
     # print(json.dumps(response, indent=2))
     return jsonify(response)
+
+@app.route("/tsp/output")
+@app.route("/tsp/output/<output_name>")
+def output(output_name=None):
+    assert output_name.startswith("ts-out."), output_name
+    assert "/" not in output_name, output_name
+    with open(os.path.join("/tmp", output_name)) as f:
+        return f.read()
+
 
 def test_list():
     print()
