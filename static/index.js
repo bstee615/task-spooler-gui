@@ -41,6 +41,10 @@ function reloadData() {
 }
 
 function initLastUpdateIndicator() {
+    // initialize events
+    updateLastUpdateIndicator();
+
+    // clear old timeouts
     for (let timeoutIdx of timeouts) {
         clearTimeout(timeoutIdx);
     }
@@ -49,7 +53,7 @@ function initLastUpdateIndicator() {
     }
     timeouts = [];
     intervals = [];
-    updateLastUpdateIndicator();
+
     // set timeout on next multiple of 10 seconds (to keep it nice and round)
     let firstDate = new Date();
     let targetSeconds = Math.ceil(firstDate.getSeconds() / 10) * 10;
@@ -117,8 +121,9 @@ function loadTable() {
             },
         ],
     });
-    initLastUpdateIndicator();
-}
+    $('#mainTable').on('xhr.dt', function () {
+        updateLastUpdateIndicator();
+    });
 
 $(document).ready(function () {
     loadSockets();
