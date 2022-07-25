@@ -20,7 +20,7 @@ function loadSockets() {
         $.each(data, function (key, value) {
             $select.append(`<option value="${value}">${value}</option>`);
         });
-        $select.prepend("<option value='' selected='selected'>default</option>");
+        $select.prepend("<option value='' selected='selected'>&lt;default&gt;</option>");
     })
 }
 
