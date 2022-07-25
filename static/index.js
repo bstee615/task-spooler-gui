@@ -28,19 +28,19 @@ function loadSockets() {
 
 $("#socketName").change(function () {
     table.ajax.url(getAjaxUrl()).load();
-    initLastRefreshIndicator();
+    initLastUpdateIndicator();
 })
 
-function updateLastRefreshIndicator() {
-    $("#lastRefresh").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
+function updateLastUpdateIndicator() {
+    $("#lastUpdate").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
 }
 
-function refreshData() {
+function reloadData() {
     table.ajax.reload();
-    updateLastRefreshIndicator();
+    updateLastUpdateIndicator();
 }
 
-function initLastRefreshIndicator() {
+function initLastUpdateIndicator() {
     for (let timeoutIdx of timeouts) {
         clearTimeout(timeoutIdx);
     }
@@ -49,13 +49,13 @@ function initLastRefreshIndicator() {
     }
     timeouts = [];
     intervals = [];
-    updateLastRefreshIndicator();
+    updateLastUpdateIndicator();
     // set timeout on next multiple of 10 seconds (to keep it nice and round)
     let firstDate = new Date();
     let targetSeconds = Math.ceil(firstDate.getSeconds() / 10) * 10;
-    timeouts.push(setTimeout(refreshData, (targetSeconds - firstDate.getSeconds()) * 1000));
+    timeouts.push(setTimeout(reloadData, (targetSeconds - firstDate.getSeconds()) * 1000));
     timeouts.push(setTimeout(function () {
-        intervals.push(setInterval(refreshData, RELOAD_INTERVAL_SECONDS * 1000));
+        intervals.push(setInterval(reloadData, RELOAD_INTERVAL_SECONDS * 1000));
     }, (targetSeconds - firstDate.getSeconds()) * 1000));
 }
 
@@ -117,7 +117,7 @@ function loadTable() {
             },
         ],
     });
-    initLastRefreshIndicator();
+    initLastUpdateIndicator();
 }
 
 $(document).ready(function () {
