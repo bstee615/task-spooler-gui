@@ -1,3 +1,4 @@
+import glob
 import json
 import os
 import re
@@ -118,6 +119,9 @@ def list(socket_name=None):
         response_df = response_df.iloc[:length]
     response_df["DT_RowId"] = response_df["ID"]
 
+    # TODO: load columns
+    # TODO: load order
+
     response = {
         "draw": draw,
         "recordsTotal": len(data_df),
@@ -135,8 +139,21 @@ def output(output_name=None):
     with open(os.path.join("/tmp", output_name)) as f:
         return f.read()
 
+def get_socket_names():
+    sockets = glob.glob("/tmp/socket.*")
+    socket_names = [os.path.basename(s)[len("socket."):] for s in sockets]
+    return socket_names
+
+@app.route("/tsp/list_sockets")
+def list_sockets():
+    return jsonify(get_socket_names())
+
 
 def test_list():
     print()
     print(tsp_list("devign"))
     print(tsp_list("devign").to_json(orient="values"))
+
+def test_sockets():
+    print()
+    print(get_socket_names())

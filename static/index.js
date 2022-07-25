@@ -13,10 +13,25 @@ function basename(path) {
 
 let table = null;
 
+function loadSockets() {
+    $.getJSON("/tsp/list_sockets", function (data) {
+        console.log(data)
+        let $select = $("#socketName");
+        $.each(data, function (key, value) {
+            $select.append(`<option value="${value}">${value}</option>`);
+        });
+        $select.prepend("<option value='' selected='selected'>default</option>");
+    })
+}
+
+$("#socketName").change(function () {
+    table.ajax.url(getAjaxUrl()).load();
+})
+
 function getAjaxUrl() {
     let socketName = $("#socketName").val();
     let url = "/tsp/list"
-    if (socketName != "") {
+    if (socketName) {
         url += "/" + socketName
     }
     return url;
@@ -69,10 +84,6 @@ function loadTable() {
 }
 
 $(document).ready(function () {
-    // loadSockets();
+    loadSockets();
     loadTable();
 });
-
-$("#refreshButton").click(function () {
-    table.ajax.url(getAjaxUrl()).load();
-})
