@@ -5,13 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <title>task-spooler</title>
   <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
 </head>
 
 <body>
-  <h1>GUI for task-spooler</h1>
+  <div class="header">
+    <img class="icon" src="{{ url_for('static', filename='noun-spool-447490.png') }}" alt="Spool icon" width="50px">
+    <h1>GUI for task-spooler</h1>
+  </div>
   <div>
     <label for="socketName">Socket:</label>
     <select id="socketName" name="socketName"></select>
@@ -21,5 +25,13 @@
   <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
   <script src="{{url_for('static', filename='index.js')}}"></script>
 </body>
+
+<footer>
+  <small>
+    <p>task-spooler v0</p>
+    <p>Copyright 2022, Ben Steenhoek</p>
+    <p>Icon: Spool by Eliricon from NounProject.com</p>
+  </small>
+</footer>
 
 </html>
