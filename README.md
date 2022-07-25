@@ -4,6 +4,8 @@ A web-based GUI for task-spooler, for easy monitoring/access.
 
 # Setup
 
+Install dependencies.
+
 ```bash
 python3 -m venv .env
 source activate.sh
@@ -11,6 +13,8 @@ pip install -r requirements.txt
 ```
 
 # Run
+
+Run these commands or use `tsp-gui`.
 
 ```bash
 source activate.sh
