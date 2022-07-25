@@ -56,7 +56,12 @@ function loadTable() {
                 title: "Output",
                 data: "Output",
                 render: function (data, type, row) {
-                    return '<a href="/tsp/output/' + basename(data) + '">' + data + '</a>';
+                    if (data.startsWith("/tmp/ts-out.")) {
+                        return '<a href="/tsp/output/' + basename(data) + '">' + data + '</a>';
+                    }
+                    else {
+                        return data
+                    }
                 },
             },
             {
