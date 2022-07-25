@@ -57,19 +57,53 @@ def tsp_list(socket_name):
             fields.append(long_field_rest)
         return fields
     rows = [to_row(l) for l in rows]
-    df = pd.DataFrame(data=rows, columns=column_names).set_index("ID")
+    df = pd.DataFrame(data=rows, columns=column_names)
+    df["ID"] = df["ID"].astype(int)
+    df = df.set_index("ID", drop=False).sort_index()
     return df
 
 @app.route("/tsp/list")
 @app.route("/tsp/list/<socket_name>")
 def list(socket_name=None):
-    data_by_column = tsp_list(socket_name)
-    data_json = data_by_column.to_json(orient="values")
-    print(data_json)
-    return jsonify(data_json)
+    """
+    {
+        "draw": 1,
+        "recordsTotal": 57,
+        "recordsFiltered": 57,
+        "data": [
+            [
+                "Angelica",
+                "Ramos",
+                "System Architect",
+                "London",
+                "9th Oct 09",
+                "$2,875"
+            ],
+            [
+                "Ashton",
+                "Cox",
+                "Technical Author",
+                "San Francisco",
+                "12th Jan 09",
+                "$4,800"
+            ],
+            ...
+        ]
+    }
+    """
+    data_df = tsp_list(socket_name)
+
+    filtered_df = data_df
+    data_obj = filtered_df.to_dict('split')
+    response = {
+        "draw": 1,
+        "recordsTotal": len(data_df),
+        "recordsFiltered": len(data_df),
+        "data": data_obj["data"]
+    }
+    return jsonify(response)
 
 def test_list():
     print()
-    # print(tsp_list(None))
     print(tsp_list("devign"))
     print(tsp_list("devign").to_json(orient="values"))

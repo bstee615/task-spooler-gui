@@ -1,4 +1,11 @@
-columns = ["ID", "State", "Output", "E-Level", "Times(r/u/s)", "Command [run=0/1]"]
+columns = [
+    "ID",
+    "State",
+    "Output",
+    "E-Level",
+    "Times(r/u/s)",
+    "Command [run=0/1]",
+]
 
 function loadTable() {
     let socketName = $("#socketName").val();
@@ -9,8 +16,9 @@ function loadTable() {
     console.log(url, socketName);
     $.getJSON(url, function (data) {
         $('#mainTable').DataTable({
-            data: data,
-            columns: columns.map((col) => {return { title: col, data: col }})
+            serverSide: true,
+            processing: true,
+            ajax: { url: url }
         });
     });
 }
