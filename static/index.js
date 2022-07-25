@@ -147,10 +147,11 @@ function loadTable() {
 }
 
 function loadOutputDisplay() {
-    $('#showOutputCheck').prop('checked', false);
-    $("#outputDisplay").hide();
+    if (!$('#showOutputCheck').prop('checked')) {
+        $("#outputDisplay").hide();
+    }
     $("#showOutputCheck").click(function () {
-        if ($(this).is(":checked")) {
+        if ($(this).prop('checked')) {
             $("#outputDisplay").show();
         } else {
             $("#outputDisplay").hide();
