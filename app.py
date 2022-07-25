@@ -16,14 +16,18 @@ def hello():
     return render_template("index.html")
 
 @app.route("/tsp/list")
-def list():
-    output = subprocess.check_output("tsp -l", shell=True, encoding="utf-8")
+@app.route("/tsp/list/<socket_name>")
+def list(socket_name=None):
+    env = {}
+    if socket_name is not None:
+        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    output = subprocess.check_output("tsp -l", env=env, shell=True, encoding="utf-8")
     print(output)
     lines = output.splitlines()
     header_line = lines[0]
     column_names = header_line.split(maxsplit=5)
     print(column_names)
-    assert column_names[-1] == "Command [run=0/1]", column_names[-1]
+    assert "Command" in column_names[-1], column_names[-1]
     lines = lines[1:]
     lines = [l.split(maxsplit=5) for l in lines]
     lines_by_header = [dict(zip(column_names, column_datas)) for column_datas in lines]
