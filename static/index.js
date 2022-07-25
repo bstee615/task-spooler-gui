@@ -18,7 +18,41 @@ function loadTable() {
         $('#mainTable').DataTable({
             serverSide: true,
             processing: true,
-            ajax: { url: url }
+            ajax: { url: url },
+            columns: [
+                {
+                    title: "ID",
+                    data: "ID",
+                },
+                {
+                    title: "State",
+                    data: "State",
+                },
+                {
+                    title: "Output",
+                    data: "Output",
+                },
+                {
+                    title: "E-Level",
+                    data: "E-Level",
+                },
+                {
+                    title: "Command",
+                    data: "Command",
+                },
+                {
+                    title: "Time (real)",
+                    data: "Time (real)",
+                },
+                {
+                    title: "Time (user)",
+                    data: "Time (user)",
+                },
+                {
+                    title: "Time (system)",
+                    data: "Time (system)",
+                },
+            ],
         });
     });
 }

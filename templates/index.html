@@ -13,20 +13,7 @@
 <body>
   <h1>GUI for task-spooler</h1>
   <div><label for="socketName">Socket:</label><input type="text" id="socketName" name="socketName" value="devign"></div>
-  <table id="mainTable">
-    <thead>
-      <tr>
-        <th></th>
-        <th>State</th>
-        <th>Output</th>
-        <th>E-Level</th>
-        <th>Command [run=0/1]</th>
-        <th>Time (real)</th>
-        <th>Time (user)</th>
-        <th>Time (system)</th>
-      </tr>
-    </thead>
-  </table>
+  <table id="mainTable"></table>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
   <script src="{{url_for('static', filename='index.js')}}"></script>
