@@ -88,7 +88,7 @@ function loadTable() {
                 data: "Output",
                 render: function (data, type, row) {
                     if (data.startsWith("/tmp/ts-out.")) {
-                        return '<a href="/tsp/output/' + basename(data) + '">' + data + '</a>';
+                        return '<a class="ts-out-link" href="/tsp/output/' + basename(data) + '">' + data + '</a>';
                     }
                     else {
                         return data
@@ -123,4 +123,13 @@ function loadTable() {
 $(document).ready(function () {
     loadSockets();
     loadTable();
+});
+
+$("#outputDisplay").hide();
+$("#showOutputCheck").click(function() {
+    if($(this).is(":checked")) {
+        $("#outputDisplay").show(300);
+    } else {
+        $("#outputDisplay").hide(200);
+    }
 });
