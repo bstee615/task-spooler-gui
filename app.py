@@ -4,6 +4,7 @@ import pandas as pd
 from flask import Flask
 from flask import render_template
 from flask import jsonify
+from flask import request
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -94,9 +95,19 @@ def list(socket_name=None):
     data_df = tsp_list(socket_name)
 
     filtered_df = data_df
+    draw = int(request.args.get("draw", 0))
+    start = request.args.get('start', None)
+    if start is not None:
+        start = int(start)
+        filtered_df = filtered_df.iloc[start:]
+    length = request.args.get('length', None)
+    if start is not None:
+        length = int(length)
+        filtered_df = filtered_df.iloc[:length]
+
     data_obj = filtered_df.to_dict('split')
     response = {
-        "draw": 1,
+        "draw": draw,
         "recordsTotal": len(data_df),
         "recordsFiltered": len(data_df),
         "data": data_obj["data"]
