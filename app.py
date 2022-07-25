@@ -17,6 +17,12 @@ def hello_world():
 def hello():
     return render_template("index.html")
 
+def split_time(time):
+    if time is None:
+        return None, None, None
+    else:
+        return time.split("/")
+
 def tsp_list(socket_name):
     env = {}
     if socket_name is not None:
@@ -61,6 +67,8 @@ def tsp_list(socket_name):
     df = pd.DataFrame(data=rows, columns=column_names)
     df["ID"] = df["ID"].astype(int)
     df = df.set_index("ID", drop=False).sort_index()
+    df["Time (r)"], df["Time (u)"], df["Time (s)"] = zip(*df["Times(r/u/s)"].apply(split_time))
+    df = df.drop(columns=["Times(r/u/s)"])
     return df
 
 @app.route("/tsp/list")
