@@ -105,6 +105,14 @@ function loadTable() {
             {
                 title: "Command",
                 data: "Command",
+                render: function (data, type, row) {
+                    if (data) {
+                        return '<pre><code>' + basename(data) + '</code></pre>';
+                    }
+                    else {
+                        return data
+                    }
+                },
             },
             {
                 title: "Time (real)",
