@@ -2,6 +2,21 @@
 
 A web-based GUI for task-spooler, for easy monitoring/access.
 
+# Setup
+
+```bash
+python3 -m venv .env
+source activate.sh
+pip install -r requirements.txt
+```
+
+# Run
+
+```bash
+source activate.sh
+flask run
+```
+
 # Attribution
 
 Icon: Spool by Eliricon from NounProject.com
