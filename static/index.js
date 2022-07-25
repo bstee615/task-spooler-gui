@@ -37,7 +37,6 @@ function updateLastUpdateIndicator() {
 
 function reloadData() {
     table.ajax.reload();
-    updateLastUpdateIndicator();
 }
 
 function initLastUpdateIndicator() {
@@ -124,17 +123,43 @@ function loadTable() {
     $('#mainTable').on('xhr.dt', function () {
         updateLastUpdateIndicator();
     });
+    $('#mainTable').on('draw.dt', function () {
+        $(".ts-out-link").click(function (e) {
+            if ($("#showOutputCheck").is(":checked")) {
+                $this = $(this)
+                let href = $this.attr("href");
+                $.ajax({
+                    type: "GET",
+                    url: href,
+                    success: function (text) {
+                        $("#outputDisplayFilename").text($this.text());
+                        $("#outputDisplayText").text(text);
+                    }
+                });
+
+                // prevent link
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+    initLastUpdateIndicator();
+}
+
+function loadOutputDisplay() {
+    $('#showOutputCheck').prop('checked', false);
+    $("#outputDisplay").hide();
+    $("#showOutputCheck").click(function () {
+        if ($(this).is(":checked")) {
+            $("#outputDisplay").show();
+        } else {
+            $("#outputDisplay").hide();
+        }
+    });
+}
 
 $(document).ready(function () {
     loadSockets();
     loadTable();
-});
-
-$("#outputDisplay").hide();
-$("#showOutputCheck").click(function() {
-    if($(this).is(":checked")) {
-        $("#outputDisplay").show(300);
-    } else {
-        $("#outputDisplay").hide(200);
-    }
+    loadOutputDisplay();
 });
