@@ -186,8 +186,8 @@ function loadTable() {
                 data: "ID",
                 render: function (data, type, row) {
                     let buttonText = `<div><div>${data}</div>`
-                    buttonText += `<button type="button" class="kill-link btn btn-warning" data-id="${data}" ${row["State"] === "running" ? "" : "disabled"}>Kill</button>`
-                    buttonText += `<button type="button" class="remove-link btn btn-danger" data-id="${data}" ${row["State"] === "running" ? "disabled" : ""}>Remove</button>`;
+                    buttonText += `<button type="button" class="kill-link btn btn-warning" data-id="${data}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`
+                    buttonText += `<button type="button" class="remove-link btn btn-danger" data-id="${data}" ${row["State"] === "running" ? "disabled" : ""}><i class="bi bi-trash"></i> Remove</button>`;
                     buttonText += "</div>";
                     return buttonText;
                 },
