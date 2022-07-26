@@ -95,11 +95,12 @@ function updateOutputDisplayFile(e) {
         filename
     };
 
-    updateOutputDisplay();
-
-    // prevent link
-    e.preventDefault();
-    return false;
+    let tookAction = updateOutputDisplay();
+    if (tookAction) {
+        // prevent link
+        e.preventDefault();
+        return false;
+    }
 }
 
 function resetOutputDisplay() {
@@ -137,7 +138,9 @@ function updateOutputDisplay() {
                 console.error(err);
             }
         });
+        return true;
     }
+    return false;
 }
 
 function killJob() {
@@ -207,7 +210,7 @@ function loadTable() {
                 data: "Output",
                 render: function (data, type, row) {
                     if (data.startsWith("/tmp/ts-out.")) {
-                        return '<a class="ts-out-link" href="/tsp/output/' + basename(data) + '">' + data + '</a>';
+                        return '<a class="ts-out-link" href="/tsp/output/' + basename(data) + '" download>' + data + '</a>';
                     }
                     else {
                         return data
