@@ -27,7 +27,7 @@ function loadSockets() {
 
 $("#socketName").change(function () {
     table.ajax.url(getAjaxUrl()).load();
-    initLastUpdateIndicator();
+    initUpdates();
 })
 
 function updateLastUpdateIndicator() {
@@ -36,9 +36,12 @@ function updateLastUpdateIndicator() {
 
 function reloadData() {
     table.ajax.reload();
+    if ($("#updateOutputCheck").prop("checked")) {
+        updateOutputDisplay();
+    }
 }
 
-function initLastUpdateIndicator() {
+function initUpdates() {
     // initialize events
     updateLastUpdateIndicator();
 
@@ -71,14 +74,29 @@ function getAjaxUrl() {
 }
 
 const numLinesTail = 10;
+let tailFile = null;
 
-function updateOutputDisplay(e) {
-    if ($("#showOutputCheck").prop("checked")) {
-        $this = $(this)
-        let href = $this.attr("href");
+function updateOutputDisplayFile(e) {
+    $this = $(this)
+    let href = $this.attr("href");
+    let filename = $this.text();
+    tailFile = {
+        href,
+        filename
+    };
+
+    updateOutputDisplay();
+
+    // prevent link
+    e.preventDefault();
+    return false;
+}
+
+function updateOutputDisplay() {
+    if ($("#showOutputCheck").prop("checked") && tailFile != null) {
         $.ajax({
             type: "GET",
-            url: href,
+            url: tailFile.href,
             data: { 
                 numLinesTail: $("#tailCheck").prop("checked") ? numLinesTail : null,
             },
@@ -90,7 +108,7 @@ function updateOutputDisplay(e) {
                 if ($("#tailCheck").prop("checked")) {
                     numLinesText += ` (${lines.length.toLocaleString()} shown)`;
                 }
-                $("#outputDisplayFilename").text($this.text());
+                $("#outputDisplayFilename").text(tailFile.filename);
                 $("#outputDisplayNumLines").text(numLinesText);
                 $("#outputDisplayText").text(lines.join("\n"));
             },
@@ -98,10 +116,6 @@ function updateOutputDisplay(e) {
                 console.error(err);
             }
         });
-
-        // prevent link
-        e.preventDefault();
-        return false;
     }
 }
 
@@ -166,9 +180,9 @@ function loadTable() {
         updateLastUpdateIndicator();
     });
     $('#mainTable').on('draw.dt', function () {
-        $(".ts-out-link").click(updateOutputDisplay);
+        $(".ts-out-link").click(updateOutputDisplayFile);
     });
-    initLastUpdateIndicator();
+    initUpdates();
 }
 
 function loadOutputDisplay() {
