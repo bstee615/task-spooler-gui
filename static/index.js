@@ -26,6 +26,8 @@ function loadSockets() {
 }
 
 $("#socketName").change(function () {
+    resetOutputDisplay();
+
     table.ajax.url(getAjaxUrl()).load();
     initUpdates();
 })
@@ -92,6 +94,24 @@ function updateOutputDisplayFile(e) {
     return false;
 }
 
+function resetOutputDisplay() {
+    setOutputDisplay("", {"totalNumLines": 0, "text": ""});
+    tailFile = null;
+}
+
+function setOutputDisplay(filename, data) {
+    text = data["text"];
+    let lines = text.split(/\r\n|\r|\n/)
+    let totalNumLines = data["totalNumLines"];
+    let numLinesText = `${totalNumLines.toLocaleString()} lines`;
+    if ($("#tailCheck").prop("checked") && totalNumLines > 0) {
+        numLinesText += ` (${lines.length.toLocaleString()} shown)`;
+    }
+    $("#outputDisplayFilename").text(filename);
+    $("#outputDisplayNumLines").text(numLinesText);
+    $("#outputDisplayText").text(lines.join("\n"));
+}
+
 function updateOutputDisplay() {
     if ($("#showOutputCheck").prop("checked") && tailFile != null) {
         $.ajax({
@@ -101,16 +121,7 @@ function updateOutputDisplay() {
                 numLinesTail: $("#tailCheck").prop("checked") ? numLinesTail : null,
             },
             success: function (data) {
-                text = data["text"];
-                let lines = text.split(/\r\n|\r|\n/)
-                const numLines = lines.length;
-                let numLinesText = `${data["totalNumLines"].toLocaleString()} lines`;
-                if ($("#tailCheck").prop("checked")) {
-                    numLinesText += ` (${lines.length.toLocaleString()} shown)`;
-                }
-                $("#outputDisplayFilename").text(tailFile.filename);
-                $("#outputDisplayNumLines").text(numLinesText);
-                $("#outputDisplayText").text(lines.join("\n"));
+                setOutputDisplay(tailFile.filename, data);
             },
             error: function(err) {
                 console.error(err);
@@ -183,6 +194,7 @@ function loadTable() {
         $(".ts-out-link").click(updateOutputDisplayFile);
     });
     initUpdates();
+    resetOutputDisplay();
 }
 
 function loadOutputDisplay() {
