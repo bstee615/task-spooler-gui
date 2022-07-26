@@ -103,7 +103,7 @@ function updateOutputDisplayFile(e) {
 }
 
 function resetOutputDisplay() {
-    setOutputDisplay("", {"totalNumLines": 0, "text": ""});
+    setOutputDisplay("", { "totalNumLines": 0, "text": "" });
     tailFile = null;
     $("#lastUpdateOutput").text("");
 }
@@ -127,13 +127,13 @@ function updateOutputDisplay() {
         $.ajax({
             type: "GET",
             url: tailFile.href,
-            data: { 
+            data: {
                 numLinesTail: $("#tailCheck").prop("checked") ? numLinesTail : null,
             },
             success: function (data) {
                 setOutputDisplay(tailFile.filename, data);
             },
-            error: function(err) {
+            error: function (err) {
                 console.error(err);
             }
         });
@@ -151,7 +151,7 @@ function killJob() {
             console.trace("killJob received response", data);
             table.ajax.reload();
         },
-        error: function(err) {
+        error: function (err) {
             console.error(err);
         }
     });
@@ -168,7 +168,7 @@ function removeJob() {
             console.trace("removeJob received response", data);
             table.ajax.reload();
         },
-        error: function(err) {
+        error: function (err) {
             console.error(err);
         }
     });
@@ -182,15 +182,21 @@ function loadTable() {
         ajax: { url: url },
         columns: [
             {
-                title: "ID",
-                data: "ID",
+                title: "Controls",
+                targets: -1,
+                data: null,
                 render: function (data, type, row) {
-                    let buttonText = `<div><div>${data}</div>`
-                    buttonText += `<button type="button" class="kill-link btn btn-warning" data-id="${data}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`
-                    buttonText += `<button type="button" class="remove-link btn btn-danger" data-id="${data}" ${row["State"] === "running" ? "disabled" : ""}><i class="bi bi-trash"></i> Remove</button>`;
+                    id = row["ID"];
+                    let buttonText = `<div class="d-flex justify-content-end align-items-center">`
+                    buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`
+                    buttonText += `<button type="button" style="margin: .5em;" class="remove-link btn btn-danger text-nowrap" data-id="${id}" ${row["State"] === "running" ? "disabled" : ""}><i class="bi bi-trash"></i> Remove</button>`;
                     buttonText += "</div>";
                     return buttonText;
                 },
+            },
+            {
+                title: "ID",
+                data: "ID",
             },
             {
                 title: "State",
