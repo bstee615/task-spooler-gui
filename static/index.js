@@ -6,7 +6,6 @@ columns = [
     "Times(r/u/s)",
     "Command [run=0/1]",
 ]
-const RELOAD_INTERVAL_SECONDS = 10;
 let table = null;
 let timeouts = [];
 let intervals = [];
@@ -29,6 +28,11 @@ $("#socketName").change(function () {
     resetOutputDisplay();
 
     table.ajax.url(getAjaxUrl()).load();
+    updateLastUpdateIndicator();
+    initUpdates();
+})
+
+$("#updateInterval").change(function () {
     initUpdates();
 })
 
@@ -44,9 +48,6 @@ function reloadData() {
 }
 
 function initUpdates() {
-    // initialize events
-    updateLastUpdateIndicator();
-
     // clear old timeouts
     for (let timeoutIdx of timeouts) {
         clearTimeout(timeoutIdx);
@@ -57,12 +58,13 @@ function initUpdates() {
     timeouts = [];
     intervals = [];
 
-    // set timeout on next multiple of 10 seconds (to keep it nice and round)
+    // set timeout on next multiple of updateInterval seconds (to keep it nice and round)
     let firstDate = new Date();
-    let targetSeconds = Math.ceil(firstDate.getSeconds() / 10) * 10;
+    let updateInterval = parseInt($("#updateInterval").val());
+    let targetSeconds = Math.ceil(firstDate.getSeconds() / updateInterval) * updateInterval;
     timeouts.push(setTimeout(reloadData, (targetSeconds - firstDate.getSeconds()) * 1000));
     timeouts.push(setTimeout(function () {
-        intervals.push(setInterval(reloadData, RELOAD_INTERVAL_SECONDS * 1000));
+        intervals.push(setInterval(reloadData, updateInterval * 1000));
     }, (targetSeconds - firstDate.getSeconds()) * 1000));
 }
 
@@ -193,6 +195,8 @@ function loadTable() {
     $('#mainTable').on('draw.dt', function () {
         $(".ts-out-link").click(updateOutputDisplayFile);
     });
+
+    updateLastUpdateIndicator();
     initUpdates();
     resetOutputDisplay();
 }

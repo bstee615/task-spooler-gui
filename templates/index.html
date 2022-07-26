@@ -26,6 +26,17 @@
 
   <div class="container-fluid" style="margin-bottom: 65px">
     <div class="row align-items-center">
+      <label class="col-sm d-flex justify-content-start align-items-center">
+        <div>Update every:</div>
+        <div class="col-md-3" style="margin: .5em 0 .5em .5em;">
+          <select id="updateInterval" class="form-select" aria-label="Select an update interval">
+            <option value="10" selected>10 sec</option>
+            <option value="30">30 sec</option>
+            <option value="60">60 sec</option>
+          </select>
+        </div>
+      </label>
+
       <div class="col-sm">
         Last update:
         <span id="lastUpdate"></span>
