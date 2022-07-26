@@ -187,7 +187,7 @@ function loadTable() {
                 data: null,
                 render: function (data, type, row) {
                     id = row["ID"];
-                    let buttonText = `<div class="d-flex justify-content-end align-items-center">`
+                    let buttonText = `<div class="d-flex justify-content-start align-items-center">`
                     buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`
                     buttonText += `<button type="button" style="margin: .5em;" class="remove-link btn btn-danger text-nowrap" data-id="${id}" ${row["State"] === "running" ? "disabled" : ""}><i class="bi bi-trash"></i> Remove</button>`;
                     buttonText += "</div>";
@@ -231,16 +231,16 @@ function loadTable() {
                 },
             },
             {
-                title: "Time (real)",
+                title: "Time (sec)",
                 data: "Time (real)",
-            },
-            {
-                title: "Time (user)",
-                data: "Time (user)",
-            },
-            {
-                title: "Time (system)",
-                data: "Time (system)",
+                render: function (data, type, row) {
+                    if (data) {
+                        return parseFloat(data).toLocaleString()
+                    }
+                    else {
+                        return data;
+                    }
+                },
             },
         ],
     });
