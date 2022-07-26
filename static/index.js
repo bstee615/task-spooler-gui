@@ -41,7 +41,9 @@ function updateLastUpdateIndicator() {
 }
 
 function reloadData() {
-    table.ajax.reload();
+    if ($("#updateTableCheck").prop("checked")) {
+        table.ajax.reload();
+    }
     if ($("#updateOutputCheck").prop("checked")) {
         updateOutputDisplay();
     }
