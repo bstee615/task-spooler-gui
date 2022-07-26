@@ -70,7 +70,8 @@ def tsp_list(socket_name):
     df = pd.DataFrame(data=rows, columns=column_names)
     df["ID"] = df["ID"].astype(int)
     df = df.set_index("ID", drop=False).sort_index()
-    df["Time (real)"], df["Time (user)"], df["Time (system)"] = zip(*df["Times(r/u/s)"].apply(split_time))
+    if len(df) > 0:
+        df["Time (real)"], df["Time (user)"], df["Time (system)"] = zip(*df["Times(r/u/s)"].apply(split_time))
     df = df.drop(columns=["Times(r/u/s)"])
     df = df.rename(columns=lambda x: re.sub('Command.*$','Command',x))
     # print(df)
