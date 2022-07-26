@@ -174,6 +174,39 @@ def get_socket_names():
 def list_sockets():
     return jsonify(get_socket_names())
 
+def tsp_remove(job_id, socket_name):
+    assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
+    env = {}
+    if socket_name is not None:
+        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    proc = subprocess.run(f"tsp -r {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    return proc
+
+@app.route("/tsp/remove/<job_id>", methods=['POST'])
+@app.route("/tsp/remove/<job_id>/<socket_name>", methods=['POST'])
+def remove(job_id, socket_name=None):
+    completed_proc = tsp_remove(job_id, socket_name)
+    return jsonify({
+        "returncode": completed_proc.returncode,
+        "stdout": completed_proc.stdout,
+    })
+
+def tsp_kill(job_id, socket_name):
+    assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
+    env = {}
+    if socket_name is not None:
+        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    proc = subprocess.run(f"tsp -k {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    return proc
+
+@app.route("/tsp/kill/<job_id>", methods=['POST'])
+@app.route("/tsp/kill/<job_id>/<socket_name>", methods=['POST'])
+def kill(job_id, socket_name=None):
+    completed_proc = tsp_kill(job_id, socket_name)
+    return jsonify({
+        "returncode": completed_proc.returncode,
+        "stdout": completed_proc.stdout,
+    })
 
 def test_list():
     print()
@@ -183,3 +216,14 @@ def test_list():
 def test_sockets():
     print()
     print(get_socket_names())
+
+def test_remove():
+    print()
+    df = tsp_list(None)
+    print(df)
+    proc = tsp_remove(int(df.iloc[-1].name), None)
+    print(proc.returncode, proc.stdout)
+
+def test_remove_error():
+    print()
+    print(tsp_remove(0, None))

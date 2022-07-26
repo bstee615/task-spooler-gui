@@ -140,6 +140,40 @@ function updateOutputDisplay() {
     }
 }
 
+function killJob() {
+    let $this = $(this);
+    let id = $this.data("id");
+    let url = getAjaxUrl(`kill/${id}`);
+    $.ajax({
+        type: "POST",
+        url: url,
+        success: function (data) {
+            console.trace("killJob received response", data);
+            table.ajax.reload();
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+
+function removeJob() {
+    let $this = $(this);
+    let id = $this.data("id");
+    let url = getAjaxUrl(`remove/${id}`);
+    $.ajax({
+        type: "POST",
+        url: url,
+        success: function (data) {
+            console.trace("removeJob received response", data);
+            table.ajax.reload();
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+
 function loadTable() {
     let url = getAjaxUrl("list");
     table = $('#mainTable').DataTable({
@@ -150,6 +184,13 @@ function loadTable() {
             {
                 title: "ID",
                 data: "ID",
+                render: function (data, type, row) {
+                    let buttonText = `<div><div>${data}</div>`
+                    buttonText += `<button type="button" class="kill-link btn btn-warning" data-id="${data}" ${row["State"] === "running" ? "" : "disabled"}>Kill</button>`
+                    buttonText += `<button type="button" class="remove-link btn btn-danger" data-id="${data}" ${row["State"] === "running" ? "disabled" : ""}>Remove</button>`;
+                    buttonText += "</div>";
+                    return buttonText;
+                },
             },
             {
                 title: "State",
@@ -201,6 +242,8 @@ function loadTable() {
         updateLastUpdateTable();
     });
     $('#mainTable').on('draw.dt', function () {
+        $(".kill-link").click(killJob);
+        $(".remove-link").click(removeJob);
         $(".ts-out-link").click(updateOutputDisplayFile);
     });
 
