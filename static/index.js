@@ -140,7 +140,9 @@ function loadTable() {
                     type: "GET",
                     url: href,
                     success: function (text) {
+                        let numLines = text.split(/\r\n|\r|\n/).length;
                         $("#outputDisplayFilename").text($this.text());
+                        $("#outputDisplayNumLines").text(numLines.toLocaleString());
                         $("#outputDisplayText").text(text);
                     }
                 });
