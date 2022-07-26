@@ -137,8 +137,33 @@ def list(socket_name=None):
 def output(output_name=None):
     assert output_name.startswith("ts-out."), output_name
     assert "/" not in output_name, output_name
+    
+    num_lines_tail = request.args.get("numLinesTail", None)
+    if num_lines_tail:
+        num_lines_tail = int(num_lines_tail)
+    else:
+        num_lines_tail = None
+
+    num_lines = 0
     with open(os.path.join("/tmp", output_name)) as f:
-        return f.read()
+        if num_lines_tail is not None:
+            lines = []
+            line = f.readline()
+            while line:
+                num_lines += 1
+                lines.append(line)
+                if len(lines) > num_lines_tail - 1:
+                    lines.pop(0)
+                line = f.readline()
+            text = "".join(lines)
+        else:
+            text = f.read()
+            num_lines = len(text.splitlines())
+    response = {
+        "totalNumLines": num_lines,
+        "text": text,
+    }
+    return jsonify(response)
 
 def get_socket_names():
     sockets = glob.glob("/tmp/socket.*")

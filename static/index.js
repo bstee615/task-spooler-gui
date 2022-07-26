@@ -17,7 +17,6 @@ function basename(path) {
 
 function loadSockets() {
     $.getJSON("/tsp/list_sockets", function (data) {
-        console.log(data)
         let $select = $("#socketName");
         $.each(data, function (key, value) {
             $select.append(`<option value="${value}">${value}</option>`);
@@ -69,6 +68,41 @@ function getAjaxUrl() {
         url += "/" + socketName
     }
     return url;
+}
+
+const numLinesTail = 10;
+
+function updateOutputDisplay(e) {
+    if ($("#showOutputCheck").prop("checked")) {
+        $this = $(this)
+        let href = $this.attr("href");
+        $.ajax({
+            type: "GET",
+            url: href,
+            data: { 
+                numLinesTail: $("#tailCheck").prop("checked") ? numLinesTail : null,
+            },
+            success: function (data) {
+                text = data["text"];
+                let lines = text.split(/\r\n|\r|\n/)
+                const numLines = lines.length;
+                let numLinesText = `${data["totalNumLines"].toLocaleString()} lines`;
+                if ($("#tailCheck").prop("checked")) {
+                    numLinesText += ` (${lines.length.toLocaleString()} shown)`;
+                }
+                $("#outputDisplayFilename").text($this.text());
+                $("#outputDisplayNumLines").text(numLinesText);
+                $("#outputDisplayText").text(lines.join("\n"));
+            },
+            error: function(err) {
+                console.error(err);
+            }
+        });
+
+        // prevent link
+        e.preventDefault();
+        return false;
+    }
 }
 
 function loadTable() {
@@ -132,34 +166,7 @@ function loadTable() {
         updateLastUpdateIndicator();
     });
     $('#mainTable').on('draw.dt', function () {
-        $(".ts-out-link").click(function (e) {
-            if ($("#showOutputCheck").prop("checked")) {
-                $this = $(this)
-                let href = $this.attr("href");
-                $.ajax({
-                    type: "GET",
-                    url: href,
-                    success: function (text) {
-                        let lines = text.split(/\r\n|\r|\n/)
-                        const numLines = lines.length;
-                        let numLinesText = `${numLines.toLocaleString()} lines`;
-                        // TODO: tail output on server side
-                        const numLinesTail = 20;
-                        if ($("#tailCheck").prop("checked")) {
-                            lines = lines.slice(Math.max(0, lines.length-numLinesTail));
-                            numLinesText += ` (${lines.length} shown)`;
-                        }
-                        $("#outputDisplayFilename").text($this.text());
-                        $("#outputDisplayNumLines").text(numLinesText);
-                        $("#outputDisplayText").text(lines.join("\n"));
-                    }
-                });
-
-                // prevent link
-                e.preventDefault();
-                return false;
-            }
-        });
+        $(".ts-out-link").click(updateOutputDisplay);
     });
     initLastUpdateIndicator();
 }
