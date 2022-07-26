@@ -28,15 +28,15 @@
     <div class="row align-items-center">
       <label class="col-sm d-flex justify-content-start align-items-center">
         <div>Update every:</div>
-        <div class="col-md-3" style="margin: .5em 0 .5em .5em;">
+        <div class="col-md" style="margin: .5em .5em 0 .5em;">
           <select id="updateInterval" class="form-select" aria-label="Select an update interval">
             <option value="10" selected>10 sec</option>
             <option value="30">30 sec</option>
             <option value="60">60 sec</option>
           </select>
         </div>
-        <div class="col-md-3 form-check">
-          <input class="form-check-input" type="checkbox" id="updateTableCheck" checked>
+        <div class="col-md-6 form-check" style="margin: .5em 0 .5em .5em;">
+          <input class="form-check-input" type="checkbox" id="updateTableCheck">
           <label class="form-check-label" for="updateTableCheck">
             Auto-update table
           </label>
@@ -45,7 +45,7 @@
 
       <div class="col-sm">
         Last update:
-        <span id="lastUpdate"></span>
+        <span id="lastUpdateTable"></span>
       </div>
 
       <label class="col-sm d-flex justify-content-end align-items-center">
@@ -75,10 +75,14 @@
           </label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="updateOutputCheck" checked>
+          <input class="form-check-input" type="checkbox" id="updateOutputCheck">
           <label class="form-check-label" for="updateOutputCheck">
             Auto-update output
           </label>
+        </div>
+        <div class="col-sm">
+          Last update:
+          <span id="lastUpdateOutput"></span>
         </div>
       </div>
     </div>

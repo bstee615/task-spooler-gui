@@ -28,7 +28,7 @@ $("#socketName").change(function () {
     resetOutputDisplay();
 
     table.ajax.url(getAjaxUrl()).load();
-    updateLastUpdateIndicator();
+    updateLastUpdateTable();
     initUpdates();
 })
 
@@ -36,8 +36,12 @@ $("#updateInterval").change(function () {
     initUpdates();
 })
 
-function updateLastUpdateIndicator() {
-    $("#lastUpdate").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
+function updateLastUpdateTable() {
+    $("#lastUpdateTable").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
+}
+
+function updateLastUpdateOutput() {
+    $("#lastUpdateOutput").text(new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
 }
 
 function reloadData() {
@@ -101,6 +105,7 @@ function updateOutputDisplayFile(e) {
 function resetOutputDisplay() {
     setOutputDisplay("", {"totalNumLines": 0, "text": ""});
     tailFile = null;
+    $("#lastUpdateOutput").text("");
 }
 
 function setOutputDisplay(filename, data) {
@@ -118,6 +123,7 @@ function setOutputDisplay(filename, data) {
 
 function updateOutputDisplay() {
     if ($("#showOutputCheck").prop("checked") && tailFile != null) {
+        updateLastUpdateOutput();
         $.ajax({
             type: "GET",
             url: tailFile.href,
@@ -192,13 +198,13 @@ function loadTable() {
         ],
     });
     $('#mainTable').on('xhr.dt', function () {
-        updateLastUpdateIndicator();
+        updateLastUpdateTable();
     });
     $('#mainTable').on('draw.dt', function () {
         $(".ts-out-link").click(updateOutputDisplayFile);
     });
 
-    updateLastUpdateIndicator();
+    updateLastUpdateTable();
     initUpdates();
     resetOutputDisplay();
 }
