@@ -27,7 +27,7 @@ function loadSockets() {
 $("#socketName").change(function () {
     resetOutputDisplay();
 
-    table.ajax.url(getAjaxUrl()).load();
+    table.ajax.url(getAjaxUrl("list")).load();
     updateLastUpdateTable();
     initUpdates();
 })
@@ -74,9 +74,9 @@ function initUpdates() {
     }, (targetSeconds - firstDate.getSeconds()) * 1000));
 }
 
-function getAjaxUrl() {
+function getAjaxUrl(verb) {
     let socketName = $("#socketName").val();
-    let url = "/tsp/list"
+    let url = `/tsp/${verb}`
     if (socketName) {
         url += "/" + socketName
     }
@@ -141,7 +141,7 @@ function updateOutputDisplay() {
 }
 
 function loadTable() {
-    let url = getAjaxUrl();
+    let url = getAjaxUrl("list");
     table = $('#mainTable').DataTable({
         serverSide: true,
         processing: true,
