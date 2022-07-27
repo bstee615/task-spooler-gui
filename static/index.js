@@ -274,6 +274,7 @@ function loadTable() {
     $('#mainTable').on('draw.dt', function () {
         $(".kill-link").click(killJob);
         $(".remove-link").click(removeJob);
+        $(".ts-out-link").click(updateOutputDisplayFile);
     });
 
     updateLastUpdateTable();
