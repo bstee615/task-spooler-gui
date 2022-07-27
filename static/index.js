@@ -27,7 +27,8 @@ function loadSockets() {
 $("#socketName").change(function () {
     resetOutputDisplay();
 
-    table.ajax.url(getAjaxUrl("list")).load();
+    table.ajax.url(getAjaxUrl("list"));
+    reloadTable(false);
     updateLastUpdateTable();
     initUpdates();
 })
@@ -46,7 +47,7 @@ function updateLastUpdateOutput() {
 
 function reloadData() {
     if ($("#updateTableCheck").prop("checked")) {
-        table.ajax.reload();
+        reloadTable();
     }
     if ($("#updateOutputCheck").prop("checked")) {
         updateOutputDisplay();
@@ -152,10 +153,30 @@ function killJob() {
         url: url,
         success: function (data) {
             console.trace("killJob received response", data);
-            table.ajax.reload();
+            reloadTable();
         },
         error: function (err) {
             console.error(err);
+        }
+    });
+}
+
+let reloadNumber = 0;
+function reloadTable(compareWithOld = true) {
+    let oldStates = {};
+    if (compareWithOld) {
+        table.rows().every(function () {
+            var row = this.data();
+            oldStates[row["DT_RowId"]] = row["State"];
+        });
+    }
+    table.ajax.reload(function(data) {
+        if (compareWithOld) {
+            for (let row of data.data) {
+                if (row["DT_RowId"] in oldStates && oldStates[row["DT_RowId"]] !== "finished" && row["State"] === "finished") {
+                    notifyDone();
+                }
+            }
         }
     });
 }
@@ -169,7 +190,7 @@ function removeJob() {
         url: url,
         success: function (data) {
             console.trace("removeJob received response", data);
-            table.ajax.reload();
+            reloadTable();
         },
         error: function (err) {
             console.error(err);
@@ -279,3 +300,33 @@ $(document).ready(function () {
     loadTable();
     loadOutputDisplay();
 });
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/API/notification
+ */
+function notifyDone() {
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+        // If it's okay let's create a notification
+        let notification = new Notification("Hi there!");
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                let notification = new Notification("Hi there!");
+            }
+        });
+    }
+
+    // At last, if the user has denied notifications, and you
+    // want to be respectful there is no need to bother them anymore.
+}
+
