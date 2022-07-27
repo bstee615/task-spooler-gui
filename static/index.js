@@ -173,8 +173,8 @@ function reloadTable(compareWithOld = true) {
     table.ajax.reload(function(data) {
         if (compareWithOld) {
             for (let row of data.data) {
-                if (row["DT_RowId"] in oldStates && oldStates[row["DT_RowId"]] !== "finished" && row["State"] === "finished") {
-                    notifyDone();
+                if ($("#notifyCheck").prop("checked") && row["DT_RowId"] in oldStates && oldStates[row["DT_RowId"]] !== "finished" && row["State"] === "finished") {
+                    notifyDone(row["ID"]);
                 }
             }
         }
@@ -212,7 +212,7 @@ function loadTable() {
                 render: function (data, type, row) {
                     id = row["ID"];
                     let buttonText = `<div class="d-flex justify-content-start align-items-center">`
-                    buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`
+                    buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${row["State"] === "running" ? "" : "disabled"}><i class="bi bi-stop-circle"></i> Kill</button>`;
                     buttonText += `<button type="button" style="margin: .5em;" class="remove-link btn btn-danger text-nowrap" data-id="${id}" ${row["State"] === "running" ? "disabled" : ""}><i class="bi bi-trash"></i> Remove</button>`;
                     buttonText += "</div>";
                     return buttonText;
@@ -274,7 +274,6 @@ function loadTable() {
     $('#mainTable').on('draw.dt', function () {
         $(".kill-link").click(killJob);
         $(".remove-link").click(removeJob);
-        $(".ts-out-link").click(updateOutputDisplayFile);
     });
 
     updateLastUpdateTable();
@@ -304,16 +303,19 @@ $(document).ready(function () {
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/notification
  */
-function notifyDone() {
+function notifyDone(name) {
+    let message = `Job ID ${name} has finished at ${new Date().toLocaleString()}`;
+
     // Let's check if the browser supports notifications
     if (!("Notification" in window)) {
         alert("This browser does not support desktop notification");
     }
 
+
     // Let's check whether notification permissions have already been granted
     else if (Notification.permission === "granted") {
         // If it's okay let's create a notification
-        let notification = new Notification("Hi there!");
+        let notification = new Notification(message);
     }
 
     // Otherwise, we need to ask the user for permission
@@ -321,7 +323,7 @@ function notifyDone() {
         Notification.requestPermission().then(function (permission) {
             // If the user accepts, let's create a notification
             if (permission === "granted") {
-                let notification = new Notification("Hi there!");
+                let notification = new Notification(message);
             }
         });
     }

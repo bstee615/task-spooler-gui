@@ -31,7 +31,7 @@
 
   <div class="container-fluid" style="margin-bottom: 65px">
     <div class="row align-items-center">
-      <label class="col-sm d-flex justify-content-start align-items-center">
+      <label class="col-sm-4 d-flex justify-content-start align-items-center">
         <div>Update every:</div>
         <div class="col-md" style="margin: .5em .5em 0 .5em;">
           <select id="updateInterval" class="form-select" aria-label="Select an update interval">
@@ -48,7 +48,14 @@
         </div>
       </label>
 
-      <div class="col-sm">
+      <div class="col-sm form-check" style="margin: .5em 0 .5em .5em;">
+        <input class="form-check-input" type="checkbox" id="notifyCheck">
+        <label class="form-check-label" for="notifyCheck">
+          Notify on finished
+        </label>
+      </div>
+
+      <div class="col-sm-2">
         Last update:
         <span id="lastUpdateTable"></span>
       </div>
