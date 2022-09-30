@@ -2,6 +2,8 @@
 
 A web-based GUI for task-spooler, for easy monitoring/access.
 
+![Example of home page](./example.png)
+
 # Setup
 
 Install dependencies.
