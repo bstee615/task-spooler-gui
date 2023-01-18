@@ -1,77 +1,32 @@
-import glob
-import json
 import os
-import re
-import subprocess
-import pandas as pd
 from flask import Flask
 from flask import render_template
 from flask import jsonify
 from flask import request
+import task_spooler_utils as ts_utils
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-TASK_SPOOLER_CMD = "ts"
-
-def get_env(socket_name):
-    env = {}
-    if socket_name is not None:
-        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
-    return env
+def summarize_procedure(proc):
+    return {
+        "returncode": proc.returncode,
+        "stdout": proc.stdout,
+    }
 
 @app.route("/hello")
 def hello_world():
     return "Hello, World!"
 
 @app.route("/")
-def hello():
+def index():
     return render_template("index.html")
 
-def split_time(time):
-    if time is None:
-        return None, None, None
-    else:
-        return time.split("/")
-
-def tsp_list(socket_name):
-    env = get_env(socket_name)
-    output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l -M json", env=env, shell=True, encoding="utf-8")
-    data = json.loads(output)
-    df = pd.DataFrame(data=data)
-    df = df.set_index("ID", drop=False).sort_index()
-    return df
 
 @app.route("/task-spooler/list")
 @app.route("/task-spooler/list/<socket_name>")
 def list(socket_name=None):
-    """
-    {
-        "draw": 1,
-        "recordsTotal": 57,
-        "recordsFiltered": 57,
-        "data": [
-            [
-                "Angelica",
-                "Ramos",
-                "System Architect",
-                "London",
-                "9th Oct 09",
-                "$2,875"
-            ],
-            [
-                "Ashton",
-                "Cox",
-                "Technical Author",
-                "San Francisco",
-                "12th Jan 09",
-                "$4,800"
-            ],
-            ...
-        ]
-    }
-    """
-    data_df = tsp_list(socket_name)
+    data_df = ts_utils.list(socket_name)
 
     response_df = data_df
     draw = int(request.args.get("draw", 0))
@@ -94,7 +49,6 @@ def list(socket_name=None):
         "recordsFiltered": len(data_df),
         "data": response_df.to_dict('records')
     }
-    # print(json.dumps(response, indent=2))
     return jsonify(response)
 
 @app.route("/task-spooler/output")
@@ -130,61 +84,21 @@ def output(output_name=None):
     }
     return jsonify(response)
 
-def get_socket_names():
-    sockets = glob.glob("/tmp/socket.*")
-    socket_names = [os.path.basename(s)[len("socket."):] for s in sockets]
-    return socket_names
-
 @app.route("/task-spooler/list_sockets")
 def list_sockets():
-    return jsonify(get_socket_names())
+    return jsonify(ts_utils.get_socket_names())
 
-def tsp_remove(job_id, socket_name):
-    assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
-    env = get_env(socket_name)
-    proc = subprocess.run(f"{TASK_SPOOLER_CMD} -r {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
-    return proc
 
 @app.route("/task-spooler/remove/<job_id>", methods=['POST'])
 @app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=['POST'])
 def remove(job_id, socket_name=None):
-    completed_proc = tsp_remove(job_id, socket_name)
-    return jsonify({
-        "returncode": completed_proc.returncode,
-        "stdout": completed_proc.stdout,
-    })
+    completed_proc = ts_utils.tsp_remove(job_id, socket_name)
+    return jsonify(summarize_procedure(completed_proc))
 
-def tsp_kill(job_id, socket_name):
-    assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
-    env = get_env(socket_name)
-    proc = subprocess.run(f"{TASK_SPOOLER_CMD} -k {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
-    return proc
 
 @app.route("/task-spooler/kill/<job_id>", methods=['POST'])
 @app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=['POST'])
 def kill(job_id, socket_name=None):
-    completed_proc = tsp_kill(job_id, socket_name)
-    return jsonify({
-        "returncode": completed_proc.returncode,
-        "stdout": completed_proc.stdout,
-    })
+    completed_proc = ts_utils.tsp_kill(job_id, socket_name)
+    return jsonify(summarize_procedure(completed_proc))
 
-def test_list():
-    print()
-    print(tsp_list("devign"))
-    print(tsp_list("devign").to_json(orient="values"))
-
-def test_sockets():
-    print()
-    print(get_socket_names())
-
-def test_remove():
-    print()
-    df = tsp_list(None)
-    print(df)
-    proc = tsp_remove(int(df.iloc[-1].name), None)
-    print(proc.returncode, proc.stdout)
-
-def test_remove_error():
-    print()
-    print(tsp_remove(0, None))
