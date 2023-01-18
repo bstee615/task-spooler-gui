@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd $(dirname $0)
-source activate.sh
-flask run
+source venv/bin/activate
+python -m flask run
