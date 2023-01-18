@@ -9,7 +9,10 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
-def summarize_procedure(proc):
+def summarize_subprocess(proc):
+    """
+    Summarize the result of a subprocess for display/handling in the view.
+    """
     return {
         "returncode": proc.returncode,
         "stdout": proc.stdout,
@@ -29,7 +32,7 @@ def index():
 @app.route("/task-spooler/list")
 @app.route("/task-spooler/list/<socket_name>")
 def list(socket_name=None):
-    data_df = ts_utils.list(socket_name)
+    data_df = ts_utils.list_jobs(socket_name)
 
     response_df = data_df
     draw = int(request.args.get("draw", 0))
@@ -98,11 +101,11 @@ def list_sockets():
 @app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=["POST"])
 def remove(job_id, socket_name=None):
     completed_proc = ts_utils.tsp_remove(job_id, socket_name)
-    return jsonify(summarize_procedure(completed_proc))
+    return jsonify(summarize_subprocess(completed_proc))
 
 
 @app.route("/task-spooler/kill/<job_id>", methods=["POST"])
 @app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=["POST"])
 def kill(job_id, socket_name=None):
     completed_proc = ts_utils.tsp_kill(job_id, socket_name)
-    return jsonify(summarize_procedure(completed_proc))
+    return jsonify(summarize_subprocess(completed_proc))
