@@ -32,53 +32,13 @@ def tsp_list(socket_name):
     env = {}
     if socket_name is not None:
         env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
-    output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l", env=env, shell=True, encoding="utf-8")
-    lines = output.splitlines()
-    header_line = lines[0]
-    column_names = header_line.split(maxsplit=5)
-    assert "Command" in column_names[-1], column_names[-1]
-    rows = lines[1:]
-    def to_row(line):
-        fields = line.split(maxsplit=5)
-        if fields[1] == "running":
-            fields = line.split(maxsplit=2)
-            long_field = fields[-1]
-            fields = fields[:-1]
-            output, command = long_field.split(maxsplit=1)
-            fields.append(output)
-            fields.append(None)
-            fields.append(None)
-            fields.append(command)
-        if fields[1] == "queued":
-            fields = line.split(maxsplit=2)
-            long_field = fields[-1]
-            fields = fields[:-1]
-            fields.append(long_field[:len("(file)")].strip())
-            fields.append(None)
-            fields.append(None)
-            long_field_rest = long_field[len("(file)"):].strip()
-            fields.append(long_field_rest)
-        if fields[1] == "skipped":
-            fields = line.split(maxsplit=2)
-            long_field = fields[-1]
-            fields = fields[:-1]
-            fields.append(long_field[:len("(no output)")].strip())
-            fields.append(None)
-            fields.append(None)
-            long_field_rest = long_field[len("(no output)"):].strip()
-            fields.append(long_field_rest)
-        return fields
-    rows = [to_row(l) for l in rows]
-    df = pd.DataFrame(data=rows, columns=column_names)
+    output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l -M json", env=env, shell=True, encoding="utf-8")
     print("SOCKET:", socket_name)
-    print(df)
-    df["ID"] = df["ID"].astype(int)
+    print("OUTPUT:", output)
+    data = json.loads(output)
+    df = pd.DataFrame(data=data)
     df = df.set_index("ID", drop=False).sort_index()
-    if len(df) > 0:
-        df["Time (real)"], df["Time (user)"], df["Time (system)"] = zip(*df["Times(r/u/s)"].apply(split_time))
-    df = df.drop(columns=["Times(r/u/s)"])
-    df = df.rename(columns=lambda x: re.sub('Command.*$','Command',x))
-    # print(df)
+    print(df)
     return df
 
 @app.route("/task-spooler/list")

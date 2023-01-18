@@ -3,8 +3,8 @@ columns = [
     "State",
     "Output",
     "E-Level",
-    "Times(r/u/s)",
-    "Command [run=0/1]",
+    "Time",
+    "Command",
 ]
 let table = null;
 let timeouts = [];
@@ -255,8 +255,8 @@ function loadTable() {
                 },
             },
             {
-                title: "Time (sec)",
-                data: "Time (real)",
+                title: "Time (ms)",
+                data: "Time_ms",
                 render: function (data, type, row) {
                     if (data) {
                         return parseFloat(data).toLocaleString()
