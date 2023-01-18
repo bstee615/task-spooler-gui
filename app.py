@@ -14,6 +14,12 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 TASK_SPOOLER_CMD = "ts"
 
+def get_env(socket_name):
+    env = {}
+    if socket_name is not None:
+        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    return env
+
 @app.route("/hello")
 def hello_world():
     return "Hello, World!"
@@ -29,9 +35,7 @@ def split_time(time):
         return time.split("/")
 
 def tsp_list(socket_name):
-    env = {}
-    if socket_name is not None:
-        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    env = get_env(socket_name)
     output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l -M json", env=env, shell=True, encoding="utf-8")
     data = json.loads(output)
     df = pd.DataFrame(data=data)
@@ -137,9 +141,7 @@ def list_sockets():
 
 def tsp_remove(job_id, socket_name):
     assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
-    env = {}
-    if socket_name is not None:
-        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    env = get_env(socket_name)
     proc = subprocess.run(f"{TASK_SPOOLER_CMD} -r {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     return proc
 
@@ -154,9 +156,7 @@ def remove(job_id, socket_name=None):
 
 def tsp_kill(job_id, socket_name):
     assert isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()), job_id
-    env = {}
-    if socket_name is not None:
-        env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
+    env = get_env(socket_name)
     proc = subprocess.run(f"{TASK_SPOOLER_CMD} -k {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     return proc
 
