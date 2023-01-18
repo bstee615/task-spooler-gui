@@ -8,15 +8,18 @@ import task_spooler_utils as ts_utils
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+
 def summarize_procedure(proc):
     return {
         "returncode": proc.returncode,
         "stdout": proc.stdout,
     }
 
+
 @app.route("/hello")
 def hello_world():
     return "Hello, World!"
+
 
 @app.route("/")
 def index():
@@ -30,11 +33,11 @@ def list(socket_name=None):
 
     response_df = data_df
     draw = int(request.args.get("draw", 0))
-    start = request.args.get('start', None)
+    start = request.args.get("start", None)
     if start is not None:
         start = int(start)
         response_df = response_df.iloc[start:]
-    length = request.args.get('length', None)
+    length = request.args.get("length", None)
     if start is not None:
         length = int(length)
         response_df = response_df.iloc[:length]
@@ -47,16 +50,17 @@ def list(socket_name=None):
         "draw": draw,
         "recordsTotal": len(data_df),
         "recordsFiltered": len(data_df),
-        "data": response_df.to_dict('records')
+        "data": response_df.to_dict("records"),
     }
     return jsonify(response)
+
 
 @app.route("/task-spooler/output")
 @app.route("/task-spooler/output/<output_name>")
 def output(output_name=None):
     assert output_name.startswith("ts-out."), output_name
     assert "/" not in output_name, output_name
-    
+
     num_lines_tail = request.args.get("numLinesTail", None)
     if num_lines_tail:
         num_lines_tail = int(num_lines_tail)
@@ -84,21 +88,21 @@ def output(output_name=None):
     }
     return jsonify(response)
 
+
 @app.route("/task-spooler/list_sockets")
 def list_sockets():
     return jsonify(ts_utils.get_socket_names())
 
 
-@app.route("/task-spooler/remove/<job_id>", methods=['POST'])
-@app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=['POST'])
+@app.route("/task-spooler/remove/<job_id>", methods=["POST"])
+@app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=["POST"])
 def remove(job_id, socket_name=None):
     completed_proc = ts_utils.tsp_remove(job_id, socket_name)
     return jsonify(summarize_procedure(completed_proc))
 
 
-@app.route("/task-spooler/kill/<job_id>", methods=['POST'])
-@app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=['POST'])
+@app.route("/task-spooler/kill/<job_id>", methods=["POST"])
+@app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=["POST"])
 def kill(job_id, socket_name=None):
     completed_proc = ts_utils.tsp_kill(job_id, socket_name)
     return jsonify(summarize_procedure(completed_proc))
-

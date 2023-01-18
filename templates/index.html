@@ -1,145 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+    />
+    <title>task-spooler</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Font Icon CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+    />
+    <!-- DataTables -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"
+    />
+    <!-- DataTables Bootstrap plugin -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <title>task-spooler</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <!-- Bootstrap Font Icon CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-  <!-- DataTables Bootstrap plugin -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-</head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            class="icon"
+            src="{{ url_for('static', filename='noun-spool-447490.png') }}"
+            class="d-inline-block align-top"
+            alt="Spool icon"
+            width="40"
+          />
+          GUI for task-spooler
+        </a>
+      </div>
+    </nav>
 
-<body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img class="icon" src="{{ url_for('static', filename='noun-spool-447490.png') }}"
-          class="d-inline-block align-top" alt="Spool icon" width="40">
-        GUI for task-spooler
-      </a>
-    </div>
-  </nav>
+    <div class="container-fluid" style="margin-bottom: 65px">
+      <div class="row align-items-center">
+        <label class="col-sm-4 d-flex justify-content-start align-items-center">
+          <div>Update every:</div>
+          <div class="col-md" style="margin: 0.5em 0.5em 0 0.5em">
+            <select
+              id="updateInterval"
+              class="form-select"
+              aria-label="Select an update interval"
+            >
+              <option value="10" selected>10 sec</option>
+              <option value="30">30 sec</option>
+              <option value="60">60 sec</option>
+            </select>
+          </div>
+          <div class="col-md-6 form-check" style="margin: 0.5em 0 0.5em 0.5em">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="updateTableCheck"
+            />
+            <label class="form-check-label" for="updateTableCheck">
+              Auto-update table
+            </label>
+          </div>
+        </label>
 
-  <div class="container-fluid" style="margin-bottom: 65px">
-    <div class="row align-items-center">
-      <label class="col-sm-4 d-flex justify-content-start align-items-center">
-        <div>Update every:</div>
-        <div class="col-md" style="margin: .5em .5em 0 .5em;">
-          <select id="updateInterval" class="form-select" aria-label="Select an update interval">
-            <option value="10" selected>10 sec</option>
-            <option value="30">30 sec</option>
-            <option value="60">60 sec</option>
-          </select>
-        </div>
-        <div class="col-md-6 form-check" style="margin: .5em 0 .5em .5em;">
-          <input class="form-check-input" type="checkbox" id="updateTableCheck">
-          <label class="form-check-label" for="updateTableCheck">
-            Auto-update table
+        <div class="col-sm form-check" style="margin: 0.5em 0 0.5em 0.5em">
+          <input class="form-check-input" type="checkbox" id="notifyCheck" />
+          <label class="form-check-label" for="notifyCheck">
+            Notify on finished
           </label>
         </div>
-      </label>
 
-      <div class="col-sm form-check" style="margin: .5em 0 .5em .5em;">
-        <input class="form-check-input" type="checkbox" id="notifyCheck">
-        <label class="form-check-label" for="notifyCheck">
-          Notify on finished
+        <div class="col-sm-2">
+          Last update:
+          <span id="lastUpdateTable"></span>
+        </div>
+
+        <label class="col-sm d-flex justify-content-end align-items-center">
+          <div>Socket:</div>
+          <div class="col-md-3" style="margin: 0.5em 0 0.5em 0.5em">
+            <select
+              id="socketName"
+              class="form-select"
+              aria-label="Select a socket"
+            ></select>
+          </div>
         </label>
       </div>
 
-      <div class="col-sm-2">
-        Last update:
-        <span id="lastUpdateTable"></span>
+      <div class="row">
+        <table id="mainTable" class="table table-striped"></table>
       </div>
 
-      <label class="col-sm d-flex justify-content-end align-items-center">
-        <div>Socket:</div>
-        <div class="col-md-3" style="margin: .5em 0 .5em .5em;">
-          <select id="socketName" class="form-select" aria-label="Select a socket"></select>
-        </div>
-      </label>
-    </div>
-
-    <div class="row">
-      <table id="mainTable" class="table table-striped"></table>
-    </div>
-
-    <div class="row">
-      <div class="container">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="showOutputCheck" checked>
-          <label class="form-check-label" for="showOutputCheck">
-            Show output
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="tailCheck" checked>
-          <label class="form-check-label" for="tailCheck">
-            Show tail only (last 10 lines, no effect on download)
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="updateOutputCheck">
-          <label class="form-check-label" for="updateOutputCheck">
-            Auto-update output
-          </label>
+      <div class="row">
+        <div class="container">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="showOutputCheck"
+              checked
+            />
+            <label class="form-check-label" for="showOutputCheck">
+              Show output
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="tailCheck"
+              checked
+            />
+            <label class="form-check-label" for="tailCheck">
+              Show tail only (last 10 lines, no effect on download)
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="updateOutputCheck"
+            />
+            <label class="form-check-label" for="updateOutputCheck">
+              Auto-update output
+            </label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="container">
-        <div class="row m-1">
-          <div id="outputDisplay">
-            <div class="row">
-              <div class="col">
-                Last update:
-                <span id="lastUpdateOutput"></span>
+      <div class="row">
+        <div class="container">
+          <div class="row m-1">
+            <div id="outputDisplay">
+              <div class="row">
+                <div class="col">
+                  Last update:
+                  <span id="lastUpdateOutput"></span>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                File: <span id="outputDisplayFilename"></span>
+              <div class="row">
+                <div class="col">
+                  File: <span id="outputDisplayFilename"></span>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <span id="outputDisplayNumLines"></span>
+              <div class="row">
+                <div class="col">
+                  <span id="outputDisplayNumLines"></span>
+                </div>
               </div>
-            </div>
-            <div class="row bg-light border-dark rounded">
-              <pre><code id="outputDisplayText"></code></pre>
+              <div class="row bg-light border-dark rounded">
+                <pre><code id="outputDisplayText"></code></pre>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <footer class="navbar navbar-expand-lg fixed-bottom navbar-light bg-light" style="height: 55px">
-    <div class="container-fluid">
-      <div class="mx-auto">
-        <p class="text-center">
-          task-spooler GUI v0 |
-          Created by <a href="http://benjijang.com">Ben Steenhoek</a> |
-          Contribute on <a href="https://github.com/bstee615/task-spooler-gui">Github</a> |
-          Icon: Spool by Eliricon from NounProject.com
-        </p>
+    <footer
+      class="navbar navbar-expand-lg fixed-bottom navbar-light bg-light"
+      style="height: 55px"
+    >
+      <div class="container-fluid">
+        <div class="mx-auto">
+          <p class="text-center">
+            task-spooler GUI v0 | Created by
+            <a href="http://benjijang.com">Ben Steenhoek</a> | Contribute on
+            <a href="https://github.com/bstee615/task-spooler-gui">Github</a> |
+            Icon: Spool by Eliricon from NounProject.com
+          </p>
+        </div>
       </div>
-    </div>
-  </footer>
-</body>
+    </footer>
+  </body>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-<script src="{{url_for('static', filename='index.js')}}"></script>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+  <script src="{{url_for('static', filename='index.js')}}"></script>
 </html>
