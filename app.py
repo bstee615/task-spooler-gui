@@ -33,12 +33,9 @@ def tsp_list(socket_name):
     if socket_name is not None:
         env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
     output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l -M json", env=env, shell=True, encoding="utf-8")
-    print("SOCKET:", socket_name)
-    print("OUTPUT:", output)
     data = json.loads(output)
     df = pd.DataFrame(data=data)
     df = df.set_index("ID", drop=False).sort_index()
-    print(df)
     return df
 
 @app.route("/task-spooler/list")
