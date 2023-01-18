@@ -15,7 +15,7 @@ function basename(path) {
 }
 
 function loadSockets() {
-    $.getJSON("/tsp/list_sockets", function (data) {
+    $.getJSON("/task-spooler/list_sockets", function (data) {
         let $select = $("#socketName");
         $.each(data, function (key, value) {
             $select.append(`<option value="${value}">${value}</option>`);
@@ -77,7 +77,7 @@ function initUpdates() {
 
 function getAjaxUrl(verb) {
     let socketName = $("#socketName").val();
-    let url = `/tsp/${verb}`
+    let url = `/task-spooler/${verb}`
     if (socketName) {
         url += "/" + socketName
     }
@@ -231,7 +231,7 @@ function loadTable() {
                 data: "Output",
                 render: function (data, type, row) {
                     if (data.startsWith("/tmp/ts-out.")) {
-                        return '<a class="ts-out-link" href="/tsp/output/' + basename(data) + '" download>' + data + '</a>';
+                        return '<a class="ts-out-link" href="/task-spooler/output/' + basename(data) + '" download>' + data + '</a>';
                     }
                     else {
                         return data

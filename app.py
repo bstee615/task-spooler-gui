@@ -12,6 +12,8 @@ from flask import request
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+TASK_SPOOLER_CMD = "ts"
+
 @app.route("/hello")
 def hello_world():
     return "Hello, World!"
@@ -30,7 +32,7 @@ def tsp_list(socket_name):
     env = {}
     if socket_name is not None:
         env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
-    output = subprocess.check_output("tsp -l", env=env, shell=True, encoding="utf-8")
+    output = subprocess.check_output(f"{TASK_SPOOLER_CMD} -l", env=env, shell=True, encoding="utf-8")
     lines = output.splitlines()
     header_line = lines[0]
     column_names = header_line.split(maxsplit=5)
@@ -68,6 +70,8 @@ def tsp_list(socket_name):
         return fields
     rows = [to_row(l) for l in rows]
     df = pd.DataFrame(data=rows, columns=column_names)
+    print("SOCKET:", socket_name)
+    print(df)
     df["ID"] = df["ID"].astype(int)
     df = df.set_index("ID", drop=False).sort_index()
     if len(df) > 0:
@@ -77,8 +81,8 @@ def tsp_list(socket_name):
     # print(df)
     return df
 
-@app.route("/tsp/list")
-@app.route("/tsp/list/<socket_name>")
+@app.route("/task-spooler/list")
+@app.route("/task-spooler/list/<socket_name>")
 def list(socket_name=None):
     """
     {
@@ -132,8 +136,8 @@ def list(socket_name=None):
     # print(json.dumps(response, indent=2))
     return jsonify(response)
 
-@app.route("/tsp/output")
-@app.route("/tsp/output/<output_name>")
+@app.route("/task-spooler/output")
+@app.route("/task-spooler/output/<output_name>")
 def output(output_name=None):
     assert output_name.startswith("ts-out."), output_name
     assert "/" not in output_name, output_name
@@ -170,7 +174,7 @@ def get_socket_names():
     socket_names = [os.path.basename(s)[len("socket."):] for s in sockets]
     return socket_names
 
-@app.route("/tsp/list_sockets")
+@app.route("/task-spooler/list_sockets")
 def list_sockets():
     return jsonify(get_socket_names())
 
@@ -179,11 +183,11 @@ def tsp_remove(job_id, socket_name):
     env = {}
     if socket_name is not None:
         env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
-    proc = subprocess.run(f"tsp -r {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    proc = subprocess.run(f"{TASK_SPOOLER_CMD} -r {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     return proc
 
-@app.route("/tsp/remove/<job_id>", methods=['POST'])
-@app.route("/tsp/remove/<job_id>/<socket_name>", methods=['POST'])
+@app.route("/task-spooler/remove/<job_id>", methods=['POST'])
+@app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=['POST'])
 def remove(job_id, socket_name=None):
     completed_proc = tsp_remove(job_id, socket_name)
     return jsonify({
@@ -196,11 +200,11 @@ def tsp_kill(job_id, socket_name):
     env = {}
     if socket_name is not None:
         env["TS_SOCKET"] = f"/tmp/socket.{socket_name}"
-    proc = subprocess.run(f"tsp -k {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    proc = subprocess.run(f"{TASK_SPOOLER_CMD} -k {job_id}", env=env, shell=True, encoding="utf-8", stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     return proc
 
-@app.route("/tsp/kill/<job_id>", methods=['POST'])
-@app.route("/tsp/kill/<job_id>/<socket_name>", methods=['POST'])
+@app.route("/task-spooler/kill/<job_id>", methods=['POST'])
+@app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=['POST'])
 def kill(job_id, socket_name=None):
     completed_proc = tsp_kill(job_id, socket_name)
     return jsonify({
