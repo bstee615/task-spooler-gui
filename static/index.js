@@ -243,7 +243,7 @@ function loadTable() {
         title: "Output",
         data: "Output",
         render: function (data, type, row) {
-          if (data.startsWith("/tmp/ts-out.")) {
+          if (data && data.startsWith("/tmp/ts-out.")) {
             return (
               '<a class="ts-out-link" href="/task-spooler/output/' +
               basename(data) +
@@ -276,7 +276,7 @@ function loadTable() {
         data: "Time_ms",
         render: function (data, type, row) {
           if (data) {
-            return parseFloat(data).toLocaleString();
+            return parseFloat(data).toLocaleString().replace("NaN", "-");
           } else {
             return data;
           }
