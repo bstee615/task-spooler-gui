@@ -3,7 +3,7 @@ from flask import Flask
 from flask import render_template
 from flask import jsonify
 from flask import request
-import task_spooler_utils as ts_utils
+from . import task_spooler_utils as ts_utils
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True

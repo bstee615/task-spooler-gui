@@ -1,0 +1,11 @@
+[project]
+name = "task_spooler_gui"
+version = "0.0.0"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.setuptools.package-data]
+mypkg = ["*.html", "*.js"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
