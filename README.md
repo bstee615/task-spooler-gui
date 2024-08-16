@@ -9,8 +9,8 @@ A web-based GUI for task-spooler, for easy monitoring/access.
 Install dependencies.
 
 ```bash
-python3 -m venv .env
-source activate.sh
+python3 -m venv .env && \
+source activate.sh && \
 pip install -r requirements.txt
 ```
 
