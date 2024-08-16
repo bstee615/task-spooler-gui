@@ -1,0 +1,13 @@
+[Unit]
+Description=GUI for task-spooler (https://github.com/bstee615/task-spooler-gui)
+After=network.target
+
+[Service]
+Restart=on-failure
+RestartSec=5
+WorkingDirectory=__CWD__
+ExecStart=bash scripts/serve.sh
+
+[Install]
+WantedBy=multi-user.target
+

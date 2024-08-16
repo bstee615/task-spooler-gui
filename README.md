@@ -6,21 +6,21 @@ A web-based GUI for task-spooler, for easy monitoring/access.
 
 # Setup
 
-Install dependencies.
-
 ```bash
-python3 -m venv .env && \
-source activate.sh && \
-pip install -r requirements.txt
+# First, clone and enter this repository
+git clone https://github.com/bstee615/task-spooler-gui && cd task-spooler-gui
+
+# Install dependencies
+bash scripts/install_env.sh
+# Set up persistent service
+bash scripts/install_service.sh
 ```
 
 # Run
 
-Run these commands or use `tsp-gui`.
-
 ```bash
-source activate.sh
-flask run
+# This is the same script used by install_service.sh
+bash scripts/serve.sh
 ```
 
 # Attribution
