@@ -2,8 +2,7 @@ import glob
 import os
 import subprocess
 import pandas as pd
-
-TASK_SPOOLER_CMD = "ts"
+from config import TASK_SPOOLER_CMD
 
 
 

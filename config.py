@@ -1,0 +1,1 @@
+TASK_SPOOLER_CMD = "tsp"
