@@ -110,3 +110,6 @@ def remove(job_id, socket_name=None):
 def kill(job_id, socket_name=None):
     completed_proc = ts_utils.tsp_kill(job_id, socket_name)
     return jsonify(summarize_subprocess(completed_proc))
+
+if __name__ == '__main__':
+    app.run(debug=True, port=4000)
