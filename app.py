@@ -44,7 +44,8 @@ def list(socket_name=None):
     if start is not None:
         length = int(length)
         response_df = response_df.iloc[:length]
-    response_df["DT_RowId"] = response_df["ID"]
+    response_df["DT_RowId"] = response_df.index
+    data = response_df.to_dict("records")
 
     # TODO: load columns
     # TODO: load order
@@ -53,7 +54,7 @@ def list(socket_name=None):
         "draw": draw,
         "recordsTotal": len(data_df),
         "recordsFiltered": len(data_df),
-        "data": response_df.to_dict("records"),
+        "data": data,
     }
     return jsonify(response)
 

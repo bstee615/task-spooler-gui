@@ -3,8 +3,8 @@ import task_spooler_utils as ts_utils
 
 def test_list():
     print()
-    print(ts_utils.list_jobs("devign"))
-    print(ts_utils.list_jobs("devign").to_json(orient="values"))
+    print(ts_utils.list_jobs())
+    print(ts_utils.list_jobs().to_json(orient="values"))
 
 
 def test_sockets():
