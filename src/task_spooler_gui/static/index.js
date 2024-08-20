@@ -167,6 +167,7 @@ function killJob() {
 
 let reloadNumber = 0;
 function reloadTable(compareWithOld = true) {
+  updateLastUpdateTable();
   let oldStates = {};
   if (compareWithOld) {
     table.rows().every(function () {
@@ -209,85 +210,88 @@ function removeJob() {
 
 function loadTable() {
   let url = getAjaxUrl("list");
+  const columns = [
+    {
+      title: "Controls",
+      targets: -1,
+      data: null,
+      render: function (data, type, row) {
+        id = row["ID"];
+        let buttonText = `<div class="d-flex justify-content-start align-items-center">`;
+        buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${
+          row["State"] === "running" ? "" : "disabled"
+        }><i class="bi bi-stop-circle"></i> Kill</button>`;
+        buttonText += `<button type="button" style="margin: .5em;" class="remove-link btn btn-danger text-nowrap" data-id="${id}" ${
+          row["State"] === "running" ? "disabled" : ""
+        }><i class="bi bi-trash"></i> Remove</button>`;
+        buttonText += "</div>";
+        return buttonText;
+      },
+    },
+    {
+      title: "ID",
+      data: "ID",
+    },
+    {
+      title: "State",
+      data: "State",
+    },
+    {
+      title: "Output",
+      data: "Output",
+      render: function (data, type, row) {
+        if (data && data.startsWith("/tmp/ts-out.")) {
+          return (
+            '<a class="ts-out-link" href="/task-spooler/output/' +
+            basename(data) +
+            '" download>' +
+            data +
+            "</a>"
+          );
+        } else {
+          return data;
+        }
+      },
+    },
+    {
+      title: "E-Level",
+      data: "E-Level",
+    },
+    {
+      title: "Command",
+      data: "Command",
+      render: function (data, type, row) {
+        if (data) {
+          return "<pre><code>" + basename(data) + "</code></pre>";
+        } else {
+          return data;
+        }
+      },
+    },
+    {
+      title: "Time (ms)",
+      data: "Time_ms",
+      render: function (data, type, row) {
+        if (data) {
+          return parseFloat(data).toLocaleString().replace("NaN", "-");
+        } else {
+          return data;
+        }
+      },
+    },
+  ];
   table = $("#mainTable").DataTable({
     serverSide: true,
     processing: true,
     ajax: { url: url },
-    columns: [
-      {
-        title: "Controls",
-        targets: -1,
-        data: null,
-        render: function (data, type, row) {
-          id = row["ID"];
-          let buttonText = `<div class="d-flex justify-content-start align-items-center">`;
-          buttonText += `<button type="button" style="margin: .5em;" class="kill-link btn btn-warning text-nowrap" data-id="${id}" ${
-            row["State"] === "running" ? "" : "disabled"
-          }><i class="bi bi-stop-circle"></i> Kill</button>`;
-          buttonText += `<button type="button" style="margin: .5em;" class="remove-link btn btn-danger text-nowrap" data-id="${id}" ${
-            row["State"] === "running" ? "disabled" : ""
-          }><i class="bi bi-trash"></i> Remove</button>`;
-          buttonText += "</div>";
-          return buttonText;
-        },
-      },
-      {
-        title: "ID",
-        data: "ID",
-      },
-      {
-        title: "State",
-        data: "State",
-      },
-      {
-        title: "Output",
-        data: "Output",
-        render: function (data, type, row) {
-          if (data && data.startsWith("/tmp/ts-out.")) {
-            return (
-              '<a class="ts-out-link" href="/task-spooler/output/' +
-              basename(data) +
-              '" download>' +
-              data +
-              "</a>"
-            );
-          } else {
-            return data;
-          }
-        },
-      },
-      {
-        title: "E-Level",
-        data: "E-Level",
-      },
-      {
-        title: "Command",
-        data: "Command",
-        render: function (data, type, row) {
-          if (data) {
-            return "<pre><code>" + basename(data) + "</code></pre>";
-          } else {
-            return data;
-          }
-        },
-      },
-      {
-        title: "Time (ms)",
-        data: "Time_ms",
-        render: function (data, type, row) {
-          if (data) {
-            return parseFloat(data).toLocaleString().replace("NaN", "-");
-          } else {
-            return data;
-          }
-        },
-      },
-    ],
+    info: true,
+    lengthMenu: [5, 10, 20, -1],
+    columns,
   });
-  $("#mainTable").on("xhr.dt", function () {
+  table.on("xhr.dt", function () {
     updateLastUpdateTable();
   });
-  $("#mainTable").on("draw.dt", function () {
+  table.on("draw.dt", function () {
     $(".kill-link").click(killJob);
     $(".remove-link").click(removeJob);
     $(".ts-out-link").click(updateOutputDisplayFile);
