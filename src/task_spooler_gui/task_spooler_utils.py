@@ -64,8 +64,15 @@ def list_jobs(socket_name=None):
     )
     data = parse_tasklist_to_json(output)
     df = pd.DataFrame(data=data)
-    df = df.set_index("ID", drop=False).sort_index()
     df["Time_ms"] = df["Times"].str.split("/").str[0].astype(float).fillna("-")
+    df["StateOrder"] = df["State"].apply(lambda x: [
+        "running",
+        "queued",
+        "finished",
+    ].index(x))
+    df["IDOrder"] = df["ID"].apply(lambda x: int(x))
+    df = df.sort_values(by=["StateOrder", "IDOrder"])
+    df = df.set_index("ID", drop=False)
     return df
 
 
