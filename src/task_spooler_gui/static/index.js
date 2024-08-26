@@ -262,7 +262,7 @@ function loadTable() {
       data: "Command",
       render: function (data, type, row) {
         if (data) {
-          return "<pre><code>" + basename(data) + "</code></pre>";
+          return "<pre><code>" + data + "</code></pre>";
         } else {
           return data;
         }
