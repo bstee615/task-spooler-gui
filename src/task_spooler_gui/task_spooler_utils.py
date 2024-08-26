@@ -71,7 +71,7 @@ def list_jobs(socket_name=None):
         "finished",
     ].index(x))
     df["IDOrder"] = df["ID"].apply(lambda x: int(x))
-    df = df.sort_values(by=["StateOrder", "IDOrder"])
+    # df = df.sort_values(by=["StateOrder", "IDOrder"])
     df = df.set_index("ID", drop=False)
     return df
 
