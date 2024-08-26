@@ -258,6 +258,10 @@ function loadTable() {
       data: "E-Level",
     },
     {
+      title: "Label",
+      data: "Label",
+    },
+    {
       title: "Command",
       data: "Command",
       render: function (data, type, row) {

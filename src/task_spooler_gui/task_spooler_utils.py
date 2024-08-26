@@ -1,5 +1,6 @@
 import glob
 import os
+import re
 import subprocess
 import pandas as pd
 from .config import TASK_SPOOLER_CMD
@@ -41,6 +42,13 @@ def parse_tasklist_to_json(input_str):
             time, _, command = d["Times"].partition(" ")
             d["Times"] = time
             d["Command"] = command
+        if d["Command"].startswith("["):
+            # This is a label. Extract it.
+            m = re.match(r"\[([^]]+)\](.*)", d["Command"])
+            if m:
+                d["Label"], d["Command"] = m.groups()
+        else:
+            d["Label"] = None
 
     # Convert to JSON
     return all_parsed_data
