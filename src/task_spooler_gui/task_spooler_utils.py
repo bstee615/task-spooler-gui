@@ -6,52 +6,44 @@ from .config import TASK_SPOOLER_CMD
 
 
 
-def parse_tasklist_to_json(data):
-    lines = data.strip().split('\n')
-    assert lines[0].strip().startswith("ID")
-    lines = lines[1:]
+def parse_tasklist_to_json(input_str):
+    lines = input_str.strip().splitlines()
 
-    parsed_data = []
-    for line in lines:
-        # Split the line into fields by multiple spaces
-        parts = line.split()
+    # Extract headers and data
+    header = lines[0]
+    data = lines[1:]
 
-        # Extract fields based on known positions
-        job_id = parts[0]
-        state = parts[1]
-        if state == "finished":
-            output_idx = 2
-            error_idx = 3
-            time_idx = 4
-            command_idx = 5
-        elif state == "running":
-            output_idx = 2
-            error_idx = None
-            time_idx = None
-            command_idx = 3
-        elif state == "queued":
-            output_idx = None
-            error_idx = None
-            time_idx = None
-            command_idx = 3
+    # Identify column offsets by the position of each header
+    columns = [
+        "ID", "State", "Output", "E-Level", "Times",
+    ]
+
+    offsets = [header.find(col) for col in columns]
+
+    # Create dictionary for the parsed data
+    all_parsed_data = []
+    for line in data:
+        parsed_data = {}
+        for i, col in enumerate(columns):
+            if i == len(columns)-1:
+                value = line[offsets[i]:].rstrip()
+            else:
+                value = line[offsets[i]:offsets[i+1]].rstrip()
+            parsed_data[col] = value
+        parsed_data["ID"] = int(parsed_data["ID"])
+        all_parsed_data.append(parsed_data)
+
+    for d in all_parsed_data:
+        if d["Times"].startswith(" "):
+            d["Command"] = d["Times"].strip()
+            d["Times"] = None
         else:
-            raise NotImplementedError(state)
-        output = parts[output_idx] if output_idx is not None else None
-        e_level = parts[error_idx] if error_idx is not None else None
-        times = parts[time_idx] if time_idx is not None else None
-        command = " ".join(parts[command_idx:])
+            time, _, command = d["Times"].partition(" ")
+            d["Times"] = time
+            d["Command"] = command
 
-        # Append to the list of parsed data
-        parsed_data.append({
-            "ID": job_id,
-            "State": state,
-            "Output": output,
-            "E-Level": e_level,
-            "Times": times,
-            "Command": command
-        })
-
-    return parsed_data
+    # Convert to JSON
+    return all_parsed_data
 
 
 def list_jobs(socket_name=None):
