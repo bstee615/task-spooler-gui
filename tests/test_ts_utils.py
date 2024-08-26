@@ -1,4 +1,4 @@
-import task_spooler_utils as ts_utils
+import task_spooler_gui.task_spooler_utils as ts_utils
 
 
 def test_list():
