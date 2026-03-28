@@ -101,14 +101,14 @@ def list_sockets():
 @app.route("/task-spooler/remove/<job_id>", methods=["POST"])
 @app.route("/task-spooler/remove/<job_id>/<socket_name>", methods=["POST"])
 def remove(job_id, socket_name=None):
-    completed_proc = ts_utils.tsp_remove(job_id, socket_name)
+    completed_proc = ts_utils.remove(job_id, socket_name)
     return jsonify(summarize_subprocess(completed_proc))
 
 
 @app.route("/task-spooler/kill/<job_id>", methods=["POST"])
 @app.route("/task-spooler/kill/<job_id>/<socket_name>", methods=["POST"])
 def kill(job_id, socket_name=None):
-    completed_proc = ts_utils.tsp_kill(job_id, socket_name)
+    completed_proc = ts_utils.kill(job_id, socket_name)
     return jsonify(summarize_subprocess(completed_proc))
 
 if __name__ == '__main__':
